@@ -1,5 +1,5 @@
-<!-- # Real Time E-Commerce Recommendation System (End-to-End ML pipeline) -->
-<!-- This project implements a production style, end-to-end machine learning system for real-time product recommendations in an e-commerce setting.
+# Real Time E-Commerce Recommendation System (End-to-End ML pipeline)
+This project implements a production style, end-to-end machine learning system for real-time product recommendations in an e-commerce setting.
 
 The system simulates how modern large scale platforms (Amazon, Walmart, etc.) deliver personalized recommendations by combining:
 
@@ -45,7 +45,6 @@ The recommendation system is implemented as a multi-stage pipeline:
    - Recall@K
    - Mean Reciprocal Rank (MRR)
    - AUC (for classification)
-
 
 
 # Data Pipeline
@@ -164,4 +163,4 @@ python src/generate_synthetic_data.py
 ### 4. Verify data
 SELECT COUNT(*) FROM products;
 SELECT COUNT(*) FROM users;
-SELECT COUNT(*) FROM events; -->
+SELECT COUNT(*) FROM events;
