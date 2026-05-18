@@ -8,10 +8,11 @@ import uuid
 from datetime import datetime, timedelta
 
 import numpy as np
+import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_batch
 
-## Config
+## Configuration
 
 DB_CONFIG = {
     "dbname": "recsys",
@@ -20,8 +21,8 @@ DB_CONFIG = {
     "port": 5432
 }
 
-NUM_PRODCUST = 3000
-NUM_USERS = 1000
+NUM_PRODUCTS = 30
+NUM_USERS = 10
 NUM_EVENTS = 25000
 
 random.seed(12)
@@ -61,27 +62,28 @@ CATEGORY_MAP = {
 }
 
 USER_SEGMENTS = ["new", "regular", "premium"]
-REGIONS = ["Texas", "California", "New York", "Florida", "Illinois"]
+REGIONS = ["Texas", "California", "New York", "Florida", "Illinois", "Michigan"]
 INVENTORY_STATUSES = ["in_stock", "low_stock", "out_of_stock"]
 SOURCES = ["app", "web"]
 
-# Product generation
+# Product Generation
 
 def generate_products(num_products: int):
     products = []
 
-    categories - list(CATEGORY_MAP.keys())
+    categories = list(CATEGORY_MAP.keys())
 
     for i in range(1, num_products + 1):
         category = random.choice(categories)
         subcategory = random.choice(CATEGORY_MAP[category]["subcategories"])
         brand = random.choice(CATEGORY_MAP[category]["brands"])
 
-        price = round(random.unifrom(5, 1500), 2)
+        price = round(random.uniform(5, 1500), 2)
         rating = round(random.uniform(2.5, 5.0), 1)
         inventory_status = random.choices(
             INVENTORY_STATUSES, weights=[0.8, 0.15, 0.05], k=1
         )[0]
+
         popularity_score = round(random.uniform(0.1, 1.0), 4)
 
         product_id = f"p{i}"
@@ -101,28 +103,29 @@ def generate_products(num_products: int):
 
     return products
 
-# User generation
+# User Generation
 
-def generate_users (num_users: int):
+def generate_users(num_users: int):
     users = []
     categories = list(CATEGORY_MAP.keys())
 
     for i in range(1, num_users + 1):
         user_id = f"u{i}"
-        segment = random.choices(USER_SEGMENTS, weights = [0.25, 0.55, 0.20], k=1)[0]
+        segment = random.choices(USER_SEGMENTS, weights=[0.25, 0.55, 0.20], k=1)[0]
         region = random.choice(REGIONS)
-        prefered_category = random.choice(categories)
+        preferred_category = random.choice(categories)
 
         users.append((
             user_id,
             segment,
             region,
-            prefered_category
+            preferred_category
         ))
 
     return users
 
-# Event generation
+# Event Generation
+
 def generate_events(num_events: int, users, products):
     events = []
 
@@ -130,7 +133,7 @@ def generate_events(num_events: int, users, products):
     for p in products:
         product_lookup[p[0]] = {
             "category": p[2],
-            "populairity_score": p[8],
+            "popularity_score": p[8],
             "inventory_status": p[7]
         }
 
@@ -145,7 +148,7 @@ def generate_events(num_events: int, users, products):
         user_id = random.choice(user_ids)
         preferred_category = user_lookup[user_id]["preferred_category"]
 
-        #Bias product choice toward preferred category
+        # Bias product choice toward preferred category
         if random.random() < 0.7:
             preferred_products = [
                 pid for pid, pdata in product_lookup.items()
@@ -181,7 +184,7 @@ def generate_events(num_events: int, users, products):
 
     return events
 
-#Database Insertion
+# Database Insertion
 def truncate_tables(conn):
     with conn.cursor() as cur:
         cur.execute("TRUNCATE TABLE events, users, products RESTART IDENTITY CASCADE;")
@@ -223,7 +226,7 @@ def insert_events(conn, events):
 
 def main():
     print("Connecting to PostgreSQL")
-    conn = psycopg2.cnnect(**DB_CONFIG)
+    conn = psycopg2.connect(**DB_CONFIG)
 
     try:
         print("Truncating existing tables")
