@@ -1,0 +1,13 @@
+{
+    "name": "backend-node",
+    "version": "1.0.0",
+    "description": "Backend API for real time recommendation system",
+    "main": "src/app.js",
+    "scripts": {
+        "dev": "nodemon src/app.js",
+        "start": "node src/app.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Saivenkata Sravan Gudepu",
+    "license": "ISC"
+}
